@@ -1,0 +1,53 @@
+
+x ; y | x/y
+$ x | x
+: x | x
+
+x = [ 1 ; 1 LEFT-MOST x | 1
+
+2 + 2 | 4
+_ + 2 2 | 4
+
+
+x ~ x | T
+x ~ ! x | F
+
+x ~ _ : | T
+x ~ ! _ : | F
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+x
+: x
+: OBJ x
+x : IS A OBJ
+: EXISTS x
+
+
+x : = y
+x = y & z
+
+
+INDEED x SEM & EFF = x
+
+x : = ( 3 = 9
+2 + y + 9
+PRE + 2 3
+x : x IS 4
+x : IS w : IS y

@@ -1,0 +1,4 @@
+
+
+ERROR_MESSAGE_PREFIX = 'Syntax Error'
+TRUE = 'TRUE'
