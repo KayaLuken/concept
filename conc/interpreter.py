@@ -1,19 +1,22 @@
-from conc.assembler import assemble
-from conc.graph import Graph
 from conc.lexer import lex
 from conc.parser_ import parse
-from conc.runner import run
-
+from conc.store import Store
 
 
 class Interpreter():
 
     def __init__(self):
-        self.graph = Graph()
+        self.store = Store()
 
     def interpret(self, s: str):
         parsed = parse(s)
         lexed = lex(parsed)
-        assembled = assemble(lexed)
-        self.output = run(assembled, self.graph)
+        self.assemble(lexed)
+        self.output = self.run()
 
+    def assemble(self, lexed):
+        self.sent = lexed[-1]
+        return self.sent.assemble(lexed[:-1])
+
+    def run(self):
+        return self.sent.eval()
