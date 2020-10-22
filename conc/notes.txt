@@ -1,0 +1,7 @@
+
+1. This sentence is false.
+2. The next sentence is true. The previous sentence is false.
+3. One always lies. One always says the truth. What would he say?
+He would say I was telling the truth. He would say I was telling a lie.
+
+How many concepts in this sentence?
