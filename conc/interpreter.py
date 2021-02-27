@@ -7,19 +7,20 @@ class Interpreter():
 
     def __init__(self):
         self.store = Store()
-        self.unassembled = []
 
     def interpret(self, s: str):
         parsed = parse(s)
         lexed = lex(parsed)
-        self.assemble(lexed)
-        if self.unassembled:
+        un_assembled = self.assemble(lexed)
+        if any(un_assembled):
             raise SyntaxError("Unassembled concepts remaining")
         self.output = self.run()
 
     def assemble(self, lexed):
+        # just get the last concept for now, until we have multiple sentences
         self.sent = lexed[-1]
-        self.sent.assemble(lexed[:-1], self)
+        lexed[-1] = None
+        return self.sent.assemble(lexed, -1)
 
     def run(self):
-        return self.sent.eval()
+        return self.sent.run()

@@ -24,6 +24,7 @@ DISTINCT
 ELLIPSIS
 ENUM
 EPIC
+EXACT
 EXCEPT
 EXCLUSIVE
 EXEC
@@ -45,6 +46,7 @@ JUNCTION
 JUST
 K-NARY (unary, binary etc)
 LIKE
+LIMIT
 LITERAL
 LOGIC
 MAP
@@ -88,6 +90,7 @@ TYPE
 UNDEFINED
 UNDER/OVER (complement over set of integers, closed under addition)
 UNIQUE
+UNTIL
 WHAT
 WHERE
 WHEN

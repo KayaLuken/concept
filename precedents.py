@@ -1,8 +1,6 @@
-from concepts import Def, Ep, Sent, Eval, Is
+from .concepts import Def, Sent, Eval
 
 precedents = [
-    [Ep],
     [Sent],
-    [Def, Eval],
-    [Is]
+    [Def, Eval]
 ]
