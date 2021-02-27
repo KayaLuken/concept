@@ -1,11 +1,11 @@
-from collections import OrderedDict
-from concepts import Def, Eval, Int, Obj, Sent, Add
+from concepts import Def, Eval, Int, Obj, Sent, Add, Equals
 
 symbolsToClasses = [
     (';', Sent),
     ('DEF', Def),
     ('EVAL', Eval),
     ('+', Add),
+    ('=', Equals),
     (lambda x: x.isdecimal(), Int),
     (lambda x: True, Obj),
 ]

@@ -4,9 +4,6 @@ from more_itertools import locate
 from conc.utils import find
 
 
-
-
-
 def find_highest_precedence_concept(concepts):
     remaining_concepts = filter(lambda x: x, concepts)
     precedences = [c.precedence for c in remaining_concepts]
@@ -14,10 +11,9 @@ def find_highest_precedence_concept(concepts):
     has_min_precedence = lambda c: c and c.precedence == min_precedence
     index = list(locate(concepts, has_min_precedence))[0]
     return concepts[index], index
-    
+
 
 class ConceptBase:
-
     is_terminal = False
 
     @property
@@ -40,6 +36,7 @@ class TerminalConcept(ConceptBase):
 
     def run(self):
         return self.value
+
 
 class UnaryConcept(ConceptBase):
     def assemble(self, lexed, position):
@@ -77,9 +74,6 @@ class BinaryConcept(ConceptBase):
             return lexed
 
 
-    def run(self):
-        return self.children[0].run() + self.children[0].run()
-
 class Int(TerminalConcept):
     def __init__(self, value):
         self.value = int(value)
@@ -91,8 +85,22 @@ class Add(BinaryConcept):
         return type(concepts[0]) is Int and type(concepts[1]) is Int
 
     def get_next_concepts(self, lexed, position):
-        return [lexed[position-1], lexed[position+1]], [position-1, position+1]
+        return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
 
+    def run(self):
+        return self.children[0].run() + self.children[0].run()
+
+
+class Equals(BinaryConcept):
+
+    def validate(self, concepts):
+        return type(concepts[0]) is Int and type(concepts[1]) is Int
+
+    def get_next_concepts(self, lexed, position):
+        return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
+
+    def run(self):
+        return self.children[0].run() == self.children[0].run()
 
 
 class Def(ConceptBase):
