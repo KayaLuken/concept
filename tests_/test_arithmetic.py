@@ -1,28 +1,14 @@
-from conc.interpreter import Interpreter
+from tests_.utils import assert_outputs
 
 
 def test_echo():
-    interpreter = Interpreter()
-    interpreter.interpret("$ 2")
-
-    assert interpreter.output == 2
-
+    assert_outputs("$ 2", 2)
 
 def test_addition():
-    interpreter = Interpreter()
-    interpreter.interpret("$ 1 + 2")
-
-    assert interpreter.output == 3
-
+    assert_outputs("$ 1 + 2", 3)
 
 def test_tautology():
-    interpreter = Interpreter()
-    interpreter.interpret("$ 1 = 1")
-
-    assert interpreter.output == True
+    assert_outputs("$ 1 = 1", True)
 
 def test_sentences():
-    interpreter = Interpreter()
-    interpreter.interpret("$ 2 ; $ 2 + 2")
-
-    assert interpreter.output == [2, 4]
+    assert_outputs("$ 2 ; $ 2 + 2", [2, 4])
