@@ -1,4 +1,3 @@
-from inspect import isfunction
 from more_itertools import locate
 
 from conc.utils import find
@@ -10,7 +9,7 @@ def find_highest_precedence_concept(concepts):
     min_precedence = min(precedences)
     has_min_precedence = lambda c: c and c.precedence == min_precedence
     index = list(locate(concepts, has_min_precedence))[0]
-    return concepts[index], index
+    return concepts[index]
 
 
 
@@ -43,7 +42,7 @@ class TerminalConcept(ConceptBase):
 class UnaryConcept(ConceptBase):
     def assemble(self, lexed, position):
         lexed[position] = None
-        concept, next_position = self.get_next_concept(position, lexed)
+        concept = self.get_next_concept(position, lexed)
 
         self.child = concept
 
@@ -153,7 +152,7 @@ class Sent(UnaryConcept):
         index, first_unconsumed_concept = find(lambda c: c is not None, lexed)
         if type(first_unconsumed_concept) not in {Eval, Def}:
             raise SyntaxError("Sentence must be evaluation or definition")
-        return lexed[index], index
+        return lexed[index]
 
 class Ep(InfinaryConcept):
 
