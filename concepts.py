@@ -8,7 +8,7 @@ def find_highest_precedence_concept(concepts):
     precedences = [c.precedence for c in remaining_concepts]
     min_precedence = min(precedences)
     has_min_precedence = lambda c: c and c.precedence == min_precedence
-    return list(filter(has_min_precedence, concepts))[0]
+    return find(has_min_precedence, concepts)
 
 
 
@@ -148,10 +148,10 @@ class Sent(UnaryConcept):
     '''Statement. Collects all concepts to the left'''
 
     def get_next_concept(self, position, lexed):
-        index, first_unconsumed_concept = find(lambda c: c is not None, lexed)
+        first_unconsumed_concept = find(lambda c: c is not None, lexed)
         if type(first_unconsumed_concept) not in {Eval, Def}:
             raise SyntaxError("Sentence must be evaluation or definition")
-        return lexed[index]
+        return lexed[first_unconsumed_concept.position]
 
 class Ep(InfinaryConcept):
 
