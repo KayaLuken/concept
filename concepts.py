@@ -8,8 +8,7 @@ def find_highest_precedence_concept(concepts):
     precedences = [c.precedence for c in remaining_concepts]
     min_precedence = min(precedences)
     has_min_precedence = lambda c: c and c.precedence == min_precedence
-    index = list(locate(concepts, has_min_precedence))[0]
-    return concepts[index]
+    return list(filter(has_min_precedence, concepts))[0]
 
 
 
