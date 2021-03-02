@@ -17,4 +17,4 @@ def assert_outputs(expression, expected_output):
     interpreter = Interpreter()
     interpreter.interpret(expression)
 
-    assert interpreter.output == expected_output
+    assert interpreter.output == expected_output, '{} != {}'.format(interpreter.output, expected_output)

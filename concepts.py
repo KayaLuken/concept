@@ -14,9 +14,7 @@ def find_highest_precedence_concept(concepts):
 
 
 def get_concept_instances(concept, concepts):
-    positions = list(locate(concepts, lambda c: type(c) is concept))
-    instances = [concepts[pos] for pos in positions] if positions else []
-    return instances, positions
+    return list(filter(lambda c: type(c) is concept, concepts))
 
 
 class ConceptBase:
@@ -79,11 +77,11 @@ class BinaryConcept(ConceptBase):
 class InfinaryConcept(ConceptBase):
     def assemble(self, lexed, position):
         lexed[position] = None
-        concepts, next_positions = self.get_next_concepts(position, lexed)
+        concepts = self.get_next_concepts(position, lexed)
         self.children = concepts
 
-        for i, (conc, pos) in enumerate(zip(concepts, next_positions)):
-            lexed = conc.assemble(lexed, pos)
+        for conc in concepts:
+            lexed = conc.assemble(lexed, conc.position)
 
         return lexed
 
@@ -156,7 +154,7 @@ class Sent(UnaryConcept):
 class Ep(InfinaryConcept):
 
     def get_next_concepts(self, position, lexed):
-        instances, next_positions = get_concept_instances(Sent, lexed)
-        if not next_positions or not isinstance(lexed[-1], Sent):
+        instances = get_concept_instances(Sent, lexed)
+        if not instances or not isinstance(lexed[-1], Sent):
             raise SyntaxError("Improper placement of sentences")
-        return instances, next_positions
+        return instances
