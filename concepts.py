@@ -60,7 +60,7 @@ class UnaryConcept(ConceptBase):
 class BinaryConcept(ConceptBase):
     def assemble(self, lexed):
         lexed[self.position] = None
-        concepts, next_positions = self.get_next_concepts(self.position, lexed)
+        concepts = self.get_next_concepts(lexed)
 
         self.children = concepts
 
@@ -68,17 +68,17 @@ class BinaryConcept(ConceptBase):
             raise SyntaxError
 
         if concepts[0].is_terminal and concepts[1].is_terminal:
-            lexed[next_positions[0]] = None
-            lexed[next_positions[1]] = None
+            lexed[concepts[0].position] = None
+            lexed[concepts[1].position] = None
             return lexed
 
-    def get_next_concepts(self, position, lexed):
-        raise NotImplemented
+    def get_next_concepts(self, lexed):
+        return [lexed[self.position - 1], lexed[self.position + 1]]
 
 class InfinaryConcept(ConceptBase):
     def assemble(self, lexed):
         lexed[self.position] = None
-        concepts = self.get_next_concepts(self.position, lexed)
+        concepts = self.get_next_concepts(lexed)
         self.children = concepts
 
         for conc in concepts:
@@ -86,7 +86,7 @@ class InfinaryConcept(ConceptBase):
 
         return lexed
 
-    def get_next_concepts(self, position, lexed):
+    def get_next_concepts(self, lexed):
         raise NotImplemented
 
     def run(self):
@@ -102,8 +102,6 @@ class Add(BinaryConcept):
     def validate(self, concepts):
         return type(concepts[0]) is Int and type(concepts[1]) is Int
 
-    def get_next_concepts(self, position, lexed):
-        return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
 
     def run(self):
         return self.children[0].run() + self.children[1].run()
@@ -113,9 +111,6 @@ class Equals(BinaryConcept):
 
     def validate(self, concepts):
         return type(concepts[0]) is Int and type(concepts[1]) is Int
-
-    def get_next_concepts(self, position, lexed):
-        return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
 
     def run(self):
         return self.children[0].run() == self.children[1].run()
@@ -154,7 +149,7 @@ class Sent(UnaryConcept):
 
 class Ep(InfinaryConcept):
 
-    def get_next_concepts(self, position, lexed):
+    def get_next_concepts(self, lexed):
         instances = get_concept_instances(Sent, lexed)
         if not instances or not isinstance(lexed[-1], Sent):
             raise SyntaxError("Improper placement of sentences")
