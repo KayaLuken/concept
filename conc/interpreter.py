@@ -15,12 +15,12 @@ class Interpreter():
         if any(un_assembled):
             raise SyntaxError("Unassembled concepts remaining")
         self.output = self.run()
+        if len(self.output) == 1:
+            self.output = self.output[0]
 
     def assemble(self, lexed):
-        # just get the last concept for now, until we have multiple sentences
-        self.sent = lexed[-1]
-        lexed[-1] = None
-        return self.sent.assemble(lexed, -1)
+        self.ep = lexed[0]
+        return self.ep.assemble(lexed, 0)
 
     def run(self):
-        return self.sent.run()
+        return self.ep.run()

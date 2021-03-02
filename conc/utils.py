@@ -1,4 +1,9 @@
+from more_itertools import locate
 
 
 def find(pred, xs):
-    return list(filter(pred, xs))[0]
+    try:
+        index = list(locate(xs, pred))[0]
+        return index, xs[index]
+    except IndexError:
+        return None, None

@@ -2,7 +2,6 @@ import pytest
 
 from ..concepts import Obj, Int
 
-foo = 3
 
 @pytest.fixture
 def x(): return Obj('x')

@@ -13,6 +13,14 @@ def find_highest_precedence_concept(concepts):
     return concepts[index], index
 
 
+
+
+def get_concept_instances(concept, concepts):
+    positions = list(locate(concepts, lambda c: type(c) is concept))
+    instances = [concepts[pos] for pos in positions] if positions else []
+    return instances, positions
+
+
 class ConceptBase:
     is_terminal = False
 
@@ -20,12 +28,6 @@ class ConceptBase:
     def precedence(self):
         from conc.lexer import symbolsToClasses
         return list(locate(symbolsToClasses, lambda x: x[1] is type(self)))[0]
-
-    def get_next_concepts(self, lexed, position):
-        raise NotImplemented
-
-    def validate(self, concept):
-        raise NotImplemented
 
 
 class TerminalConcept(ConceptBase):
@@ -41,18 +43,18 @@ class TerminalConcept(ConceptBase):
 class UnaryConcept(ConceptBase):
     def assemble(self, lexed, position):
         lexed[position] = None
-        concept, next_position = self.get_next_concepts(lexed, position)
+        concept, next_position = self.get_next_concept(position, lexed)
 
         self.child = concept
 
-        if not self.validate(concept):
-            raise SyntaxError
-
         if concept.is_terminal:
-            lexed[next_position] = None
+            lexed[concept.position] = None
             return lexed
         else:
-            return concept.assemble(lexed, next_position)
+            return concept.assemble(lexed, concept.position)
+
+    def get_next_concept(self, lexed, position):
+        raise NotImplemented
 
     def run(self):
         return self.child.run()
@@ -61,7 +63,7 @@ class UnaryConcept(ConceptBase):
 class BinaryConcept(ConceptBase):
     def assemble(self, lexed, position):
         lexed[position] = None
-        concepts, next_positions = self.get_next_concepts(lexed, position)
+        concepts, next_positions = self.get_next_concepts(position, lexed)
 
         self.children = concepts
 
@@ -73,6 +75,25 @@ class BinaryConcept(ConceptBase):
             lexed[next_positions[1]] = None
             return lexed
 
+    def get_next_concepts(self, position, lexed):
+        raise NotImplemented
+
+class InfinaryConcept(ConceptBase):
+    def assemble(self, lexed, position):
+        lexed[position] = None
+        concepts, next_positions = self.get_next_concepts(position, lexed)
+        self.children = concepts
+
+        for i, (conc, pos) in enumerate(zip(concepts, next_positions)):
+            lexed = conc.assemble(lexed, pos)
+
+        return lexed
+
+    def get_next_concepts(self, position, lexed):
+        raise NotImplemented
+
+    def run(self):
+        return [child.run() for child in self.children]
 
 class Int(TerminalConcept):
     def __init__(self, value):
@@ -84,11 +105,11 @@ class Add(BinaryConcept):
     def validate(self, concepts):
         return type(concepts[0]) is Int and type(concepts[1]) is Int
 
-    def get_next_concepts(self, lexed, position):
+    def get_next_concepts(self, position, lexed):
         return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
 
     def run(self):
-        return self.children[0].run() + self.children[0].run()
+        return self.children[0].run() + self.children[1].run()
 
 
 class Equals(BinaryConcept):
@@ -96,11 +117,11 @@ class Equals(BinaryConcept):
     def validate(self, concepts):
         return type(concepts[0]) is Int and type(concepts[1]) is Int
 
-    def get_next_concepts(self, lexed, position):
+    def get_next_concepts(self, position, lexed):
         return [lexed[position - 1], lexed[position + 1]], [position - 1, position + 1]
 
     def run(self):
-        return self.children[0].run() == self.children[0].run()
+        return self.children[0].run() == self.children[1].run()
 
 
 class Def(ConceptBase):
@@ -109,11 +130,16 @@ class Def(ConceptBase):
 
 class Eval(UnaryConcept):
 
-    def validate(self, concept):
-        return True
+    def get_next_concept(self, position, lexed):
+        next_none_indices = list(locate(lexed[position:], lambda c: c is None))
+        other_none_indices = len(next_none_indices) > 1
+        if other_none_indices:
+            next_none_index = next_none_indices[1]
+            next_none_index += position
+            return find_highest_precedence_concept(lexed[position:next_none_index])
+        else:
+            return find_highest_precedence_concept(lexed[position:])
 
-    def get_next_concepts(self, lexed, position):
-        return find_highest_precedence_concept(lexed)
 
 
 class Obj(TerminalConcept):
@@ -123,8 +149,16 @@ class Obj(TerminalConcept):
 class Sent(UnaryConcept):
     '''Statement. Collects all concepts to the left'''
 
-    def validate(self, concept):
-        return type(concept) is Def or type(concept) is Eval
+    def get_next_concept(self, position, lexed):
+        index, first_unconsumed_concept = find(lambda c: c is not None, lexed)
+        if type(first_unconsumed_concept) not in {Eval, Def}:
+            raise SyntaxError("Sentence must be evaluation or definition")
+        return lexed[index], index
 
-    def get_next_concepts(self, lexed, position):
-        return lexed[0], 0
+class Ep(InfinaryConcept):
+
+    def get_next_concepts(self, position, lexed):
+        instances, next_positions = get_concept_instances(Sent, lexed)
+        if not next_positions or not isinstance(lexed[-1], Sent):
+            raise SyntaxError("Improper placement of sentences")
+        return instances, next_positions
