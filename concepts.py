@@ -110,7 +110,9 @@ class Add(BinaryConcept):
 class Equals(BinaryConcept):
 
     def validate(self, concepts):
-        return type(concepts[0]) is Int and type(concepts[1]) is Int
+        are_ints = type(concepts[0]) is Int and type(concepts[1]) is Int
+        are_objects = type(concepts[0]) is Obj and type(concepts[1]) is Obj
+        return are_ints or are_objects
 
     def run(self):
         return self.children[0].run() == self.children[1].run()
