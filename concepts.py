@@ -1,4 +1,4 @@
-from more_itertools import locate
+from more_itertools import locate, split_at
 
 from conc.utils import find
 
@@ -123,15 +123,8 @@ class Def(ConceptBase):
 class Eval(UnaryConcept):
 
     def get_next_concept(self, lexed):
-        next_none_indices = list(locate(lexed[self.position:], lambda c: c is None))
-        other_none_indices = len(next_none_indices) > 1
-        if other_none_indices:
-            next_none_index = next_none_indices[1]
-            next_none_index += self.position
-            return find_highest_precedence_concept(lexed[self.position:next_none_index])
-        else:
-            return find_highest_precedence_concept(lexed[self.position:])
-
+        current_block = list(split_at(lexed[self.position+1:], lambda c: c is None))[0]
+        return find_highest_precedence_concept(current_block)
 
 
 class Obj(TerminalConcept):
