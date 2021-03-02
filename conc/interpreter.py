@@ -20,7 +20,7 @@ class Interpreter():
 
     def assemble(self, lexed):
         self.ep = lexed[0]
-        return self.ep.assemble(lexed, 0)
+        return self.ep.assemble(lexed)
 
     def run(self):
         return self.ep.run()

@@ -37,9 +37,9 @@ class TerminalConcept(ConceptBase):
 
 
 class UnaryConcept(ConceptBase):
-    def assemble(self, lexed, position):
-        lexed[position] = None
-        concept = self.get_next_concept(position, lexed)
+    def assemble(self, lexed):
+        lexed[self.position] = None
+        concept = self.get_next_concept(self.position, lexed)
 
         self.child = concept
 
@@ -47,7 +47,7 @@ class UnaryConcept(ConceptBase):
             lexed[concept.position] = None
             return lexed
         else:
-            return concept.assemble(lexed, concept.position)
+            return concept.assemble(lexed)
 
     def get_next_concept(self, lexed, position):
         raise NotImplemented
@@ -57,9 +57,9 @@ class UnaryConcept(ConceptBase):
 
 
 class BinaryConcept(ConceptBase):
-    def assemble(self, lexed, position):
-        lexed[position] = None
-        concepts, next_positions = self.get_next_concepts(position, lexed)
+    def assemble(self, lexed):
+        lexed[self.position] = None
+        concepts, next_positions = self.get_next_concepts(self.position, lexed)
 
         self.children = concepts
 
@@ -75,13 +75,13 @@ class BinaryConcept(ConceptBase):
         raise NotImplemented
 
 class InfinaryConcept(ConceptBase):
-    def assemble(self, lexed, position):
-        lexed[position] = None
-        concepts = self.get_next_concepts(position, lexed)
+    def assemble(self, lexed):
+        lexed[self.position] = None
+        concepts = self.get_next_concepts(self.position, lexed)
         self.children = concepts
 
         for conc in concepts:
-            lexed = conc.assemble(lexed, conc.position)
+            lexed = conc.assemble(lexed)
 
         return lexed
 
