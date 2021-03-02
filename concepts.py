@@ -19,6 +19,7 @@ def get_concept_instances(concept, concepts):
 
 class ConceptBase:
     is_terminal = False
+    position = None
 
     @property
     def precedence(self):
@@ -39,7 +40,7 @@ class TerminalConcept(ConceptBase):
 class UnaryConcept(ConceptBase):
     def assemble(self, lexed):
         lexed[self.position] = None
-        concept = self.get_next_concept(self.position, lexed)
+        concept = self.get_next_concept(lexed)
 
         self.child = concept
 
@@ -49,7 +50,7 @@ class UnaryConcept(ConceptBase):
         else:
             return concept.assemble(lexed)
 
-    def get_next_concept(self, lexed, position):
+    def get_next_concept(self, lexed):
         raise NotImplemented
 
     def run(self):
@@ -126,15 +127,15 @@ class Def(ConceptBase):
 
 class Eval(UnaryConcept):
 
-    def get_next_concept(self, position, lexed):
-        next_none_indices = list(locate(lexed[position:], lambda c: c is None))
+    def get_next_concept(self, lexed):
+        next_none_indices = list(locate(lexed[self.position:], lambda c: c is None))
         other_none_indices = len(next_none_indices) > 1
         if other_none_indices:
             next_none_index = next_none_indices[1]
-            next_none_index += position
-            return find_highest_precedence_concept(lexed[position:next_none_index])
+            next_none_index += self.position
+            return find_highest_precedence_concept(lexed[self.position:next_none_index])
         else:
-            return find_highest_precedence_concept(lexed[position:])
+            return find_highest_precedence_concept(lexed[self.position:])
 
 
 
@@ -145,7 +146,7 @@ class Obj(TerminalConcept):
 class Sent(UnaryConcept):
     '''Statement. Collects all concepts to the left'''
 
-    def get_next_concept(self, position, lexed):
+    def get_next_concept(self, lexed):
         first_unconsumed_concept = find(lambda c: c is not None, lexed)
         if type(first_unconsumed_concept) not in {Eval, Def}:
             raise SyntaxError("Sentence must be evaluation or definition")
