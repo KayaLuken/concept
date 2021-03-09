@@ -1,4 +1,4 @@
-from concepts import Def, Eval, Int, Obj, Sent, Add, Equals, Ep
+from concepts import Def, Eval, Int, Obj, Sent, Add, Equals, Ep, Subtract
 
 symbolsToClasses = [
     ('EP', Ep),
@@ -6,6 +6,7 @@ symbolsToClasses = [
     ('::', Def),
     ('$', Eval),
     ('+', Add),
+    ('-', Subtract),
     ('=', Equals),
     (lambda x: x.isdecimal(), Int),
     (lambda x: True, Obj),

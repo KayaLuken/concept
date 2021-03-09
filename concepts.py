@@ -97,14 +97,23 @@ class Int(TerminalConcept):
         self.value = int(value)
 
 
-class Add(BinaryConcept):
+class ArithmeticConcept(BinaryConcept):
+
+    def is_arithmetic_concept(self, concept):
+        return issubclass(type(concept), ArithmeticConcept) or issubclass(type(concept), TerminalConcept)
 
     def validate(self, concepts):
-        return type(concepts[0]) is Int and type(concepts[1]) is Int
+        return self.is_arithmetic_concept(concepts[0]) and self.is_arithmetic_concept(concepts[1])
 
 
+class Add(ArithmeticConcept):
     def run(self):
         return self.children[0].run() + self.children[1].run()
+
+
+class Subtract(ArithmeticConcept):
+    def run(self):
+        return self.children[0].run() - self.children[1].run()
 
 
 class Equals(BinaryConcept):
